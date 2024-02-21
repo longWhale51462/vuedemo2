@@ -22,7 +22,9 @@
     </el-radio-group>
   </el-form-item> -->
             </el-form>
-            <el-button style="margin:0 50px 30px;" @click="add">添加</el-button>
+            <el-button style="margin:0 50px 30px;" @click="add">
+              <span v-if="flag">修改</span><span v-else>添加</span>  
+            </el-button>
         </div>
     </div>
 </template>
@@ -31,6 +33,7 @@
 import axios from '../hooks/http';
 import {  mapGetters, mapMutations, mapState } from "vuex";
 import {  getDeps,getDoc} from "../hooks/getTypes";
+import dayjs from 'dayjs';
 
 export default {
     data() {
@@ -54,12 +57,20 @@ export default {
     methods: {
         // ...mapMutations(['push_doctor']),
         add(){
+            if(this.flag){
+            axios.post("/doctorCall/update",this.visit).then(res=>{
+            alert(res.data.msg);
+            if(res.data.code==200){
+                this.$router.push("/index/doctorlist");
+            }});
+            }else
            axios.post("/doctorCall/add",this.visit).then(res=>{
             alert(res.data.msg);
             if(res.data.code==200){
             this.visit.doctor.doctorId="";
             this.departmentId="";
             this.visit.callTime="";
+         
             }                 
             })
         },
@@ -80,12 +91,18 @@ export default {
         })
         console.log(this.$route.query);
         this.flag=this.$route.query.flag;
-        this.departmentId=this.$route.query.doctorCall.doctor.department.departmentId;
+        this.departmentId=this.$route.query.doctor.department.departmentId;
+        this.visit.doctor=this.$route.query.doctor;
+        this.visit.callTime=this.$route.query.callTime;
+        this.visit.timeId=this.$route.query.timeId;
+         this.flag=this.$route.query.timeId;
     },
     watch:{
         departmentId:{
             handler(newval,oldval){
-               this.visit.doctor.doctorId=null;
+                if(oldval){
+                  this.visit.doctor.doctorId=null;
+                }
                this.getDocs();
             }
         }

@@ -17,7 +17,7 @@
         <div class="box1">
             <!-- <el-button style="margin: 5px;">添加</el-button> -->
             <el-table :data="pageInfo.list" style="width: 100%" height="500px">
-                <el-table-column prop="doctor.doctorId" label="编号"> </el-table-column>
+                <el-table-column prop="timeId" label="编号"> </el-table-column>
 
                 <el-table-column prop="doctor.doctorName" label="医生"> </el-table-column>
 
@@ -102,7 +102,13 @@ export default {
                     departmentId:this.departmentId
                 }
             }).then(res=>{
+                 if(res.data.code==200)
             this.pageInfo=res.data.data;
+        else{
+        alert(res.data.msg);
+        this.pageInfo.list=[];
+        }
+           
         })
         },
         getDocs(){
@@ -116,12 +122,13 @@ export default {
             })
         },
         update(doctorCall){
+            console.log(doctorCall);
+          doctorCall.callTime=this.timefmt(doctorCall.callTime);
           this.$router.push({
             path:"/index/adddoctor",
-            query:{
-                doctorCall,
-                flag:true
-            }
+            query:
+                doctorCall
+            
             })
         }
     },    
